@@ -13,7 +13,7 @@ def top_deck(cards_out,card_deck,cards_on_table):
     if(len(cards_out) == len(card_deck)):
         cards_out = cards_out[len(cards_out)-cards_on_table:]
     while True:
-        card = list(card_deck)[random.randint(0,len(card_deck))]
+        card = list(card_deck)[random.randint(0,len(card_deck)-1)]
         if card in cards_out:
             continue
         return card
@@ -25,44 +25,62 @@ players = 4
 for x in range(players):
     name = input(f"player #{x+1}'s Name: ")
     player_list.append(name)
-    card = top_deck(cards_out,card_deck,cards_on_table)
-    cards_out.append(card)
-    cards_on_table += 1
-    player_dict.update({name:card})
+    player_dict.update({name:None})
 
 
 
-#Prints list of players, order, and thier cards
-print("Player list and order", player_list)
-print("player name and thier cards\n",player_dict)
-
-temp = player_list.pop(0)
-player_list = player_list.append(temp)
 
 def trade_card(player_list,player_dict):
     your_card = player_dict[player_list[0]]
     player_dict[player_list[0]] = player_dict[player_list[1]]
     player_dict[player_list[1]] = your_card
     temp = player_list.pop(0)
-    player_list = player_list.append(temp)
+    player_list.append(temp)
     return (player_dict, player_list)
 
 def pass_card(player_list,player_dict):
     temp = player_list.pop(0)
-    player_list = player_list.append(temp)
+    player_list.append(temp)
     return (player_dict, player_list)
 
 
-def round(player_list, player_dictionary, cards_out, card_deck, cards_on_table):
+def round(player_list, player_dict, cards_out, card_deck, cards_on_table):
+    #gives each player a card
     for name in player_list:
-        player_dictionary[name] = top_deck(cards_out,card_deck,cards_on_table)
+        player_dict[name] = top_deck(cards_out,card_deck,cards_on_table)
+        cards_out.append(player_dict[name])
+        cards_on_table += 1
+    #prints everybody and thier cards
+    print(player_dict)
+    #print(cards_out)
+    #print(cards_on_table)
 
+    #Everybody trade except last person. 
     for i in range(len(player_list)-1):
-        pass_trade = input("Do you want to pass or trade? ")
-            if pass_trade == "pass" or pass_trade == "trade":
-                break
-            
-        
+        pass_trade = input("Do you want to pass or trade? ") #will have to link w/ ryan's stuff
+        if(pass_trade == "pass"):
+            temp_list = pass_card(player_list, player_dict)
+        else:
+            temp_list = trade_card(player_list,player_dict)
+        player_list = temp_list[1]
+        player_dict = temp_list[0]
+
+    #last person top decks
+    pass_trade = input("Do you want to pass or trade? ")
+    if(pass_trade == "trade"):
+        player_dict[player_list[0]] = top_deck(cards_out,card_deck,cards_on_table)
+        cards_out.append(player_dict[player_list[0]])
+        cards_on_table += 1
+    temp = player_list.pop(0)
+    player_list.append(temp)
+    temp = player_list.pop(0)
+    player_list.append(temp)
+
+    print(player_dict)
+
+
+         
+round(player_list, player_dict, cards_out, card_deck, cards_on_table)
 
 def winner_loser(player_list,player_dict):
     pass
